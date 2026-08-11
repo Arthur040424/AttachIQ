@@ -1,0 +1,24 @@
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+*.egg-info/
+
+# Node
+node_modules/
+.next/
+out/
+
+# Environment secrets
+.env
+.env.local
+*.env
+
+# OS/editor
+.DS_Store
+.vscode/
+*.swp
+
+# Logs
+*.log
