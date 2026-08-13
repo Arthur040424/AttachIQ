@@ -59,3 +59,46 @@ class CompetencyUnit(Base):
        created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
 
        programme: Mapped["Programme"] = relationship(back_populates="competency_units")
+
+class PlacementStatus(str, enum.Enum):
+      PENDING = "PENDING"
+      ACTIVE = "ACTIVE"
+      COMPLETED = "COMPLETED"
+
+class Placement(Base):
+       __tablename__ = "placements"
+
+       id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+       student_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("users.id"), nullable=False)
+       supervisor_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("users.id"), nullable=False)
+       company_name: Mapped[str] = mapped_column(String(255), nullable=False)
+       status: Mapped[PlacementStatus] = mapped_column(Enum(PlacementStatus), nullable=False, default=PlacementStatus.PENDING)
+       start_date: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+       end_date: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+       created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+
+       student: Mapped["User"] = relationship(foreign_keys=[student_id])
+       supervisor: Mapped["User"] = relationship(foreign_keys=[supervisor_id])
+
+class EvidenceSubmission(Base):
+       __tablename__ = "evidence_submissions"
+
+       id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+       placement_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("placements.id"), nullable=False)
+       competency_unit_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("competency_units.id"), nullable=False)
+       file_url: Mapped[str] = mapped_column(String(500), nullable=False)
+       description: Mapped[str] = mapped_column(String(1000), nullable=True)
+       submitted_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+
+       placement: Mapped["Placement"] = relationship()
+       competency_unit: Mapped["CompetencyUnit"] = relationship()
+
+class Assessment(Base):
+       __tablename__ = "assessments"
+
+       id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+       placement_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("placements.id"), nullable=False)
+       competency_unit_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("competency_units.id"), nullable=False)
+       score: Mapped[int] = mapped_column(nullable=False)
+       comments: Mapped[str] = mapped_column(String(2000), nullable=True)
+       assessed_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
