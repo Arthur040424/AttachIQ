@@ -22,3 +22,5 @@ out/
 
 # Logs
 *.log
+
+seed_output.log
