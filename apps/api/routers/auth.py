@@ -7,6 +7,7 @@ from sqlalchemy import select
 from models import User
 from security import verify_password, create_access_token
 from fastapi import HTTPException, status
+from dependencies import get_current_user
 
 class LoginRequest(BaseModel):
     email: str
@@ -32,3 +33,12 @@ async def login(request: LoginRequest, db: AsyncSession = Depends(get_db)):
     })
 
     return {"access_token": access_token, "token_type": "bearer"}
+
+@router.get("/me")
+async def read_current_user(current_user: User = Depends(get_current_user)):
+    return {
+        "id": str(current_user.id),
+        "email": current_user.email,
+        "full_name": current_user.full_name,
+        "role:": current_user.role.value
+    }
