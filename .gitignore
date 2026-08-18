@@ -24,3 +24,6 @@ out/
 *.log
 
 seed_output.log
+
+apps/api/uploads/*
+!apps/api/uploads/.gitkeep
